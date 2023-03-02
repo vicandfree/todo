@@ -1,0 +1,67 @@
+{% extends "todo/base.html" %}
+
+{% block title %}
+<title>Список дел</title>
+{% endblock %}
+
+{% block content %}
+{% load tz %}
+<div>
+    <a href="{% url 'todo:create' %}" class="btn btn-primary">Добавить</a>
+</div>
+
+{% if tasks_list %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Выполено</th>
+        <th scope="col">Название</th>
+        <th scope="col">Дата выполнения</th>
+        <th scope="col">Управление</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    {% for model in tasks_list %}
+    <tr>
+        <th scope="row">{{forloop.counter}}</th>
+        <td>
+
+            <form method="post" action="{% url 'todo:update' model.id %}">
+                {% csrf_token %}
+                <div class="form-check form-switch">
+                    {% if not model.is_active %}
+                    <input class="form-check-input" type="checkbox" onclick="javascript:submit()" role="switch" checked >
+                    {% else %}
+                    <input class="form-check-input" type="checkbox" onclick="javascript:submit()" role="switch">
+                    {% endif %}
+                </div>
+            </form>
+
+        </td>
+        <td>{{ model.title }}</td>
+
+        <td>
+            {% if model.completed_at %}
+            {{ model.completed_at|localtime }}
+            {% else %}
+            -
+            {% endif %}
+        </td>
+        <td>
+            <a href="{% url 'todo:delete' model.id %}" class="btn btn-danger">
+                Удалить
+            </a>
+        </td>
+
+    </tr>
+    {% endfor %}
+
+    {% else %}
+    <p>Список дел еще нет</p>
+    {% endif %}
+
+    </tbody>
+</table>
+{% endblock %}
